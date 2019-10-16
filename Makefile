@@ -67,6 +67,18 @@ pgo:	check-go-vars
 	cd pgo && go install pgo.go
 clean:	check-go-vars
 	rm -rf $(GOPATH)/pkg/* $(GOBIN)/postgres-operator $(GOBIN)/apiserver $(GOBIN)/*pgo
+clean-images:	check-go-vars
+	buildah images -q localhost/$(PGO_IMAGE_PREFIX)/pgo-backrest | xargs buildah rmi
+	buildah images -q localhost/$(PGO_IMAGE_PREFIX)/pgo-sqlrunner | xargs buildah rmi
+	buildah images -q localhost/$(PGO_IMAGE_PREFIX)/pgo-rmdata | xargs buildah rmi
+	buildah images -q localhost/$(PGO_IMAGE_PREFIX)/pgo-load | xargs buildah rmi
+	buildah images -q localhost/$(PGO_IMAGE_PREFIX)/pgo-lspvc | xargs buildah rmi
+	buildah images -q localhost/$(PGO_IMAGE_PREFIX)/pgo-backrest-restore | xargs buildah rmi
+	buildah images -q localhost/$(PGO_IMAGE_PREFIX)/pgo-backrest-repo | xargs buildah rmi
+	buildah images -q localhost/$(PGO_IMAGE_PREFIX)/pgo-scheduler | xargs buildah rmi
+	buildah images -q localhost/$(PGO_IMAGE_PREFIX)/pgo-event | xargs buildah rmi
+	buildah images -q localhost/$(PGO_IMAGE_PREFIX)/pgo-apiserver | xargs buildah rmi
+	buildah images -q localhost/$(PGO_IMAGE_PREFIX)/postgres-operator | xargs buildah rmi
 pgo-apiserver-image:	check-go-vars pgo-apiserver
 	cp $(GOBIN)/apiserver bin/
 	sudo --preserve-env buildah bud --layers $(SQUASH) -f $(PGOROOT)/$(PGO_BASEOS)/Dockerfile.pgo-apiserver.$(PGO_BASEOS) -t $(PGO_IMAGE_PREFIX)/pgo-apiserver:$(PGO_IMAGE_TAG) $(PGOROOT)
